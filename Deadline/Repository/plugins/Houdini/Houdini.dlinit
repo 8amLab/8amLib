@@ -1,0 +1,19 @@
+﻿About=Houdini Plugin for Deadline
+ConcurrentTasks=True
+
+Houdini9_Hython_Executable=C:\Program Files\Side Effects Software\Houdini 9\bin\Hython.exe;C:\Program Files (x86)\Side Effects Software\Houdini 9\bin\Hython.exe;/Library/Frameworks/Houdini.framework/Resources/bin/hython;/usr/local/Houdini/bin/hython
+Houdini10_Hython_Executable=C:\Program Files\Side Effects Software\Houdini 10\bin\Hython.exe;C:\Program Files (x86)\Side Effects Software\Houdini 10\bin\Hython.exe;/Library/Frameworks/Houdini.framework/Resources/bin/hython;/usr/local/Houdini/bin/hython
+Houdini11_Hython_Executable=C:\Program Files\Side Effects Software\Houdini 11\bin\Hython.exe;C:\Program Files (x86)\Side Effects Software\Houdini 11\bin\Hython.exe;/Library/Frameworks/Houdini.framework/Resources/bin/hython;/usr/local/Houdini/bin/hython
+Houdini12_Hython_Executable=C:\Program Files\Side Effects Software\Houdini 12\bin\Hython.exe;C:\Program Files (x86)\Side Effects Software\Houdini 12\bin\Hython.exe;/Library/Frameworks/Houdini.framework/Resources/bin/hython;/usr/local/Houdini/bin/hython
+Houdini13_Hython_Executable=C:\Program Files\Side Effects Software\Houdini 13\bin\Hython.exe;C:\Program Files (x86)\Side Effects Software\Houdini 13\bin\Hython.exe;/Library/Frameworks/Houdini.framework/Resources/bin/hython;/usr/local/Houdini/bin/hython
+Houdini14_Hython_Executable=C:\Program Files\Side Effects Software\Houdini 14\bin\Hython.exe;C:\Program Files (x86)\Side Effects Software\Houdini 14\bin\Hython.exe;/Library/Frameworks/Houdini.framework/Resources/bin/hython;/usr/local/Houdini/bin/hython
+Houdini15_Hython_Executable=C:\Program Files\Side Effects Software\Houdini 15\bin\Hython.exe;C:\Program Files (x86)\Side Effects Software\Houdini 15\bin\Hython.exe;/Library/Frameworks/Houdini.framework/Resources/bin/hython;/usr/local/Houdini/bin/hython
+
+Houdini13_SimTracker=C:\Program Files\Side Effects Software\Houdini 13\houdini\python2.7libs\simtracker.py;C:\Program Files (x86)\Side Effects Software\Houdini 13\houdini\python2.7libs\simtracker.py;/Library/Frameworks/Houdini.framework/Resources/houdini/python2.7libs/simtracker.py;/opt/hfs13/houdini/python2.7libs/simtracker.py
+Houdini14_SimTracker=C:\Program Files\Side Effects Software\Houdini 14\houdini\python2.7libs\simtracker.py;C:\Program Files (x86)\Side Effects Software\Houdini 14\houdini\python2.7libs\simtracker.py;/Library/Frameworks/Houdini.framework/Resources/houdini/python2.7libs/simtracker.py;/opt/hfs14/houdini/python2.7libs/simtracker.py
+Houdini15_SimTracker=C:\Program Files\Side Effects Software\Houdini 15\houdini\python2.7libs\simtracker.py;C:\Program Files (x86)\Side Effects Software\Houdini 15\houdini\python2.7libs\simtracker.py;/Library/Frameworks/Houdini.framework/Resources/houdini/python2.7libs/simtracker.py;/opt/hfs15/houdini/python2.7libs/simtracker.py
+Houdini_SimTracker_Tracker_Port=8000
+Houdini_SimTracker_Web_Service_Port=9000
+Houdini_SimTracker_Use_IP_Address=True
+
+ELicSlaves=

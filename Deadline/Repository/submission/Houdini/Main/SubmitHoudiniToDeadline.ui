@@ -1,0 +1,457 @@
+#define LABEL_WIDTH 1.59
+#define MENU_WIDTH 1.58
+#define TOGGLE_WIDTH 1.49
+#define COLLAPSER_WIDTH 1.48
+#define MULTI_MENUS_WIDTH 1.10
+#define V_SPACE 0.05
+#define H_SPACE 0.10
+#define BLANK LABEL VALUE(blank.val) HSTRETCH
+#define CONTROL_WIDTH 3.00
+#define DRAFT_MARGIN_WIDTH 0.15
+#define DRAFT_LABEL_WIDTH 1.32
+#define DRAFT_DETACHED_LABEL_WIDTH 1.22
+
+joboptions.val := 1;
+pool.val = STRING_MENU{"none"}
+secondarypool.val = STRING_MENU{" "}
+group.val = STRING_MENU{"none"}
+onjobcomplete.val = STRING_MENU{"Nothing" "Archive" "Delete"}
+mantrapool.val = STRING_MENU{"none"}
+mantrasecondarypool.val = STRING_MENU{" "}
+mantragroup.val = STRING_MENU{"none"}
+arnoldpool.val = STRING_MENU{"none"}
+arnoldsecondarypool.val = STRING_MENU{" "}
+arnoldgroup.val = STRING_MENU{"none"}
+bits.val = STRING_MENU{"None" "32bit" "64bit"}
+ropoption.val = STRING_MENU{"Choose" "Selected" "All"}
+rop.val = STRING_MENU{"No Valid ROPs"}
+integration.val = STRING_MENU{"Shotgun" "FTrack"}
+backgroundoption.val = STRING_MENU{"Blank Image" "Previous Output" "Selected Image"}
+draftFormat.val = STRING_MENU{"JPEG (jpg)"}
+draftCodec.val = STRING_MENU{"mjpeg"}
+draftResolution.val = STRING_MENU{"FULL"}
+draftFrameRate.val = STRING_MENU{"24"}
+
+dlg.win = DIALOG "Submit Houdini To Deadline"
+{
+    LAYOUT(vertical) EXCLUSIVE MARGIN(0.1) SPACING(0.1) LOOK(plain) 
+    VALUE(dlg.val) WIDTH(6.85) PREF_HEIGHT(8.35) MIN_HEIGHT(1) MAX_HEIGHT(16)
+
+    SCROLLER vertical
+    {
+        LAYOUT(vertical) HSTRETCH
+
+        COLLAPSER "General Options"
+        {
+            LAYOUT(vertical) HSTRETCH VALUE(joboptions.val) SPACING(H_SPACE) JUSTIFY(left, center)
+
+            #Job Description
+            {
+                LAYOUT(vertical) HSTRETCH SPACING(V_SPACE)
+                LABEL (bold) "Job Description";
+
+                STRING_FIELD "Job Name":LABEL_WIDTH   HSTRETCH VALUE(jobname.val);
+                STRING_FIELD "Comment":LABEL_WIDTH    HSTRETCH VALUE(comment.val);
+                STRING_FIELD "Department":LABEL_WIDTH HSTRETCH VALUE(department.val);
+                BLANK;
+            }
+
+            SEPARATOR;
+
+            #Job Options
+            { 
+                LAYOUT(vertical) HSTRETCH SPACING(V_SPACE) JUSTIFY(left, center)
+                LABEL(bold) "Job Options";
+
+                { 
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+                    SELECT_MENU_BUTTON "Pool":MENU_WIDTH HSTRETCH MENU(pool.val);
+                    SELECT_MENU_BUTTON "Secondary Pool":MULTI_MENUS_WIDTH HSTRETCH MENU(secondarypool.val);
+                }
+
+                SELECT_MENU_BUTTON "Group":MENU_WIDTH HSTRETCH MENU(group.val);
+                INT_FIELD "Priority":LABEL_WIDTH VALUE(priority.val) WIDTH(CONTROL_WIDTH);
+                
+                {
+                    LAYOUT(cell) HSTRETCH SPACING(0.1, V_SPACE) JUSTIFY(left, center)
+
+                    INT_FIELD "Task Timeout":LABEL_WIDTH     CELL(0,0,0,0) VALUE(tasktimeout.val) WIDTH(CONTROL_WIDTH);
+                    TOGGLE_BUTTON "Enable Auto Task Timeout" CELL(1,0,1,0) VALUE(autotimeout.val);
+                    INT_FIELD "Concurrent Tasks":LABEL_WIDTH CELL(0,1,0,1) VALUE(concurrent.val) WIDTH(CONTROL_WIDTH);
+                    TOGGLE_BUTTON "Limit Tasks To Slave's Task Limit" CELL(1,1,1,1) VALUE(slavelimit.val);
+                    INT_FIELD "Machine Limit":LABEL_WIDTH CELL(0,2,0,2) VALUE(machinelimit.val) WIDTH(CONTROL_WIDTH);
+                    TOGGLE_BUTTON "Machine List Is A Blacklist" CELL (1,2,1,2) VALUE(isblacklist.val);              
+                }
+
+                #separate container, because each column has the same length (the textboxes mess up the look of task timeout, etc.)
+                {
+                    LAYOUT(cell) HSTRETCH SPACING (H_SPACE, V_SPACE) JUSTIFY (left, center)
+
+                    STRING_FIELD "Machine List":LABEL_WIDTH CELL(0,0,0,0) HSTRETCH VALUE(machinelist.val);
+                    ACTION_BUTTON "..." CELL (1,0,1,0) VALUE(getmachinelist.val);
+                    STRING_FIELD "Limits":LABEL_WIDTH CELL(0,1,0,1) HSTRETCH VALUE(limits.val);
+                    ACTION_BUTTON "..." CELL(1,1,1,1) VALUE(getlimits.val);
+                    STRING_FIELD "Dependencies":LABEL_WIDTH CELL(0,2,0,2) HSTRETCH VALUE(dependencies.val);
+                    ACTION_BUTTON "..." CELL(1,2,1,2) VALUE(getdependencies.val);
+                }
+
+                #separate container so it has it's own layout (would be weird looking in cells)
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left,center)
+
+                    SELECT_MENU_BUTTON "On Job Complete":MENU_WIDTH MENU(onjobcomplete.val) WIDTH(CONTROL_WIDTH);
+                    TOGGLE_BUTTON "Submit Job As Suspended" HSTRETCH VALUE(jobsuspended.val);
+                }
+            }
+
+            BLANK;
+            SEPARATOR;
+
+            #Render Options
+            {
+                LAYOUT(vertical) HSTRETCH SPACING(H_SPACE, V_SPACE)
+                LABEL(bold) "Render Options";
+
+                # Multiple containers because of override frames layout
+                {
+                    LAYOUT(cell) HSTRETCH SPACING(H_SPACE, V_SPACE) JUSTIFY(left, center)
+
+                    SELECT_MENU_BUTTON "ROP To Render":MENU_WIDTH CELL(0,0) WIDTH(4.055) VALUE(ropoption.val);
+                    SELECT_MENU_BUTTON CELL(1,0) HSTRETCH VALUE(rop.val);
+                }
+
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+                    TOGGLE_BUTTON "Override Frames":TOGGLE_WIDTH VALUE(overrideframes.val);
+                    STRING_FIELD VALUE(framelist.val) HSTRETCH;
+                }
+
+                { 
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+                    INT_FIELD "Frames Per Task":LABEL_WIDTH VALUE(framespertask.val) WIDTH(CONTROL_WIDTH);
+                    TOGGLE_BUTTON "Ignore Inputs" VALUE(ignoreinputs.val);
+                }
+                
+                { 
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+                    
+                    SELECT_MENU_BUTTON "Build To Force":LABEL_WIDTH HSTRETCH MENU(bits.val) WIDTH(CONTROL_WIDTH);
+                    TOGGLE_BUTTON "Submit Houdini Scene" VALUE(submitscene.val);
+                }
+                
+                { 
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+                    TOGGLE_BUTTON "Ignore Bypassed Nodes" VALUE(bypassDependencies.val) WIDTH(CONTROL_WIDTH);
+                    TOGGLE_BUTTON "Automatically Create Dependencies" VALUE(automaticDependencies.val);
+                }
+                
+                { 
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+                    TOGGLE_BUTTON "Submit Wedges as Separate Jobs" VALUE(separateWedgeJobs.val) WIDTH(CONTROL_WIDTH);
+                }
+                
+            }
+           
+            BLANK;
+        }
+        
+        COLLAPSER "Tile Rendering"
+        {
+            
+            LAYOUT(vertical) HSTRETCH SPACING(V_SPACE) JUSTIFY(left, center)
+            
+            {
+                LABEL "Tile rendering is supported when rendering using Mantra and when exporting to Mantra.";
+                
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+                    TOGGLE_BUTTON "Enable Tile Rendering" VALUE(tilesenabled.val) WIDTH(CONTROL_WIDTH);
+                    TOGGLE_BUTTON "Use Jigsaw Rendering" VALUE(jigsawenabled.val) WIDTH(CONTROL_WIDTH);
+                }
+                
+                { 
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+                    INT_FIELD "Tiles in X":LABEL_WIDTH VALUE(tilesinx.val) WIDTH(CONTROL_WIDTH);
+                    INT_FIELD "Tiles in Y":LABEL_WIDTH VALUE(tilesiny.val) WIDTH(CONTROL_WIDTH);
+                }
+                
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+                    
+                    ACTION_BUTTON "Open Jigsaw Window" VALUE(openjigsaw.val);
+                    LABEL "Jigsaw requires Houdini 14.0.311 or later.";
+                }
+                
+                { 
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+                    TOGGLE_BUTTON "Single Frame Tile Job Enabled" VALUE(tilessingleframeenabled.val) WIDTH(CONTROL_WIDTH);
+                    INT_FIELD "Single Job Frame":LABEL_WIDTH VALUE(tilessingleframe.val) WIDTH(CONTROL_WIDTH);
+                }
+                
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+                    TOGGLE_BUTTON "Submit Dependent Assembly Job" VALUE(submitdependentassembly.val) WIDTH(CONTROL_WIDTH);
+                    TOGGLE_BUTTON "Cleanup Tiles After Assembly" VALUE(cleanuptiles.val) WIDTH(CONTROL_WIDTH);
+                }
+                
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+                    TOGGLE_BUTTON "Error on Missing Tiles" VALUE(erroronmissingtiles.val) WIDTH(CONTROL_WIDTH);
+                    TOGGLE_BUTTON "Error on Missing Background" VALUE(erroronmissingbackground.val) WIDTH(CONTROL_WIDTH);
+                }
+                
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+                    
+                    SELECT_MENU_BUTTON "Assemble Over":MENU_WIDTH CELL(0,0) WIDTH(CONTROL_WIDTH) VALUE(backgroundoption.val);
+                }
+                
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+                    LABEL "Background Image File":TOGGLE_WIDTH HSTRETCH VALUE(backgroundimagelabel.val);
+                    FILENAME_FIELD HSTRETCH VALUE(backgroundimage.val);
+                }
+                
+            }
+            
+            BLANK;
+        }
+        
+        
+        COLLAPSER "Mantra  (For IFD Exporting)"
+        {
+            #LAYOUT(cell) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+            LAYOUT(vertical) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+            {
+                LAYOUT(vertical) HSTRETCH SPACING(V_SPACE) JUSTIFY(left, center)
+                
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+                    TOGGLE_BUTTON "Submit Dependent Mantra Standalone Job" VALUE(mantrajob.val);
+                    TOGGLE_BUTTON "Export Mantra Locally" VALUE(localmantraexport.val);
+                }
+                
+                { 
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+                    SELECT_MENU_BUTTON "Pool":MENU_WIDTH HSTRETCH MENU(mantrapool.val);
+                    SELECT_MENU_BUTTON "Secondary Pool":MULTI_MENUS_WIDTH HSTRETCH MENU(mantrasecondarypool.val);
+                }
+
+                SELECT_MENU_BUTTON "Group":MENU_WIDTH HSTRETCH MENU(mantragroup.val);
+                INT_FIELD "Priority":LABEL_WIDTH VALUE(mantrapriority.val);
+                
+                {
+                    LAYOUT(cell) HSTRETCH SPACING(0.1, V_SPACE) JUSTIFY(left, center)
+
+                    INT_FIELD "Task Timeout":LABEL_WIDTH     CELL(0,0,0,0) VALUE(mantratasktimeout.val);
+                    TOGGLE_BUTTON "Enable Auto Task Timeout" CELL(1,0,1,0) VALUE(mantraautotimeout.val);
+                    INT_FIELD "Concurrent Tasks":LABEL_WIDTH CELL(0,1,0,1) VALUE(mantraconcurrent.val);
+                    TOGGLE_BUTTON "Limit Tasks To Slave's Task Limit" CELL(1,1,1,1) VALUE(mantraslavelimit.val);
+                    INT_FIELD "Machine Limit":LABEL_WIDTH CELL(0,2,0,2) VALUE(mantramachinelimit.val);
+                    TOGGLE_BUTTON "Machine List Is A Blacklist" CELL (1,2,1,2) VALUE(mantraisblacklist.val);              
+                }
+
+                #separate container, because each column has the same length (the textboxes mess up the look of task timeout, etc.)
+                {
+                    LAYOUT(cell) HSTRETCH SPACING (H_SPACE, V_SPACE) JUSTIFY (left, center)
+
+                    STRING_FIELD "Machine List":LABEL_WIDTH CELL(0,0,0,0) HSTRETCH VALUE(mantramachinelist.val);
+                    ACTION_BUTTON "..." CELL (1,0,1,0) VALUE(mantragetmachinelist.val);
+                    STRING_FIELD "Limits":LABEL_WIDTH CELL(0,1,0,1) HSTRETCH VALUE(mantralimits.val);
+                    ACTION_BUTTON "..." CELL(1,1,1,1) VALUE(mantragetlimits.val);
+                }
+                
+                {
+                    LAYOUT(cell) HSTRETCH SPACING(0.1, V_SPACE) JUSTIFY(left, center)
+                    INT_FIELD "Mantra Threads":LABEL_WIDTH CELL(0,1,0,1) VALUE(mantrathreads.val);
+                }
+            }
+            
+            BLANK;
+        }
+        
+        COLLAPSER "Arnold Exporting"
+        {
+            #LAYOUT(cell) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+            LAYOUT(vertical) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+            {
+                LAYOUT(vertical) HSTRETCH SPACING(V_SPACE) JUSTIFY(left, center)
+                
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+                    TOGGLE_BUTTON "Submit Dependent Arnold Standalone Job" VALUE(arnoldjob.val);
+                    TOGGLE_BUTTON "Export Arnold Locally" VALUE(localarnoldexport.val);
+                }
+                
+                { 
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+                    SELECT_MENU_BUTTON "Pool":MENU_WIDTH HSTRETCH MENU(arnoldpool.val);
+                    SELECT_MENU_BUTTON "Secondary Pool":MULTI_MENUS_WIDTH HSTRETCH MENU(arnoldsecondarypool.val);
+                }
+
+                SELECT_MENU_BUTTON "Group":MENU_WIDTH HSTRETCH MENU(arnoldgroup.val);
+                INT_FIELD "Priority":LABEL_WIDTH VALUE(arnoldpriority.val);
+                
+                {
+                    LAYOUT(cell) HSTRETCH SPACING(0.1, V_SPACE) JUSTIFY(left, center)
+
+                    INT_FIELD "Task Timeout":LABEL_WIDTH     CELL(0,0,0,0) VALUE(arnoldtasktimeout.val);
+                    TOGGLE_BUTTON "Enable Auto Task Timeout" CELL(1,0,1,0) VALUE(arnoldautotimeout.val);
+                    INT_FIELD "Concurrent Tasks":LABEL_WIDTH CELL(0,1,0,1) VALUE(arnoldconcurrent.val);
+                    TOGGLE_BUTTON "Limit Tasks To Slave's Task Limit" CELL(1,1,1,1) VALUE(arnoldslavelimit.val);
+                    INT_FIELD "Machine Limit":LABEL_WIDTH CELL(0,2,0,2) VALUE(arnoldmachinelimit.val);
+                    TOGGLE_BUTTON "Machine List Is A Blacklist" CELL (1,2,1,2) VALUE(arnoldisblacklist.val);              
+                }
+
+                #separate container, because each column has the same length (the textboxes mess up the look of task timeout, etc.)
+                {
+                    LAYOUT(cell) HSTRETCH SPACING (H_SPACE, V_SPACE) JUSTIFY (left, center)
+
+                    STRING_FIELD "Machine List":LABEL_WIDTH CELL(0,0,0,0) HSTRETCH VALUE(arnoldmachinelist.val);
+                    ACTION_BUTTON "..." CELL (1,0,1,0) VALUE(arnoldgetmachinelist.val);
+                    STRING_FIELD "Limits":LABEL_WIDTH CELL(0,1,0,1) HSTRETCH VALUE(arnoldlimits.val);
+                    ACTION_BUTTON "..." CELL(1,1,1,1) VALUE(arnoldgetlimits.val);
+                }
+                
+                {
+                    LAYOUT(cell) HSTRETCH SPACING(0.1, V_SPACE) JUSTIFY(left, center)
+                    INT_FIELD "Arnold Threads":LABEL_WIDTH CELL(0,1,0,1) VALUE(arnoldthreads.val);
+                }
+            }
+            
+            BLANK;
+        }
+        
+        COLLAPSER "Integration"
+        {
+            LAYOUT(vertical) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+            #Project Management Settings
+            {
+                LAYOUT(vertical) HSTRETCH SPACING(V_SPACE) JUSTIFY(left, center)
+                LABEL(bold) "Project Management";
+
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+                    SELECT_MENU_BUTTON "Project Management":MENU_WIDTH VALUE(integration.val);
+                    ACTION_BUTTON "Connect..." VALUE(sgconnect.val);
+                    TOGGLE_BUTTON "Create new version" VALUE(sgsubmit.val);
+                }
+
+                STRING_FIELD "Version":LABEL_WIDTH HSTRETCH VALUE(sgversion.val);
+                STRING_FIELD "Description":LABEL_WIDTH HSTRETCH VALUE(sgdescription.val);
+
+                {
+                    LAYOUT(cell) HSTRETCH SPACING (H_SPACE, V_SPACE) JUSTIFY(left, center)
+
+                    LABEL "Selected Entity":COLLAPSER_WIDTH CELL(0,0) VALUE(sgentitylabel.val);
+                    LABEL HSTRETCH CELL(1,0) VALUE(sgentityinfo.val);
+                }
+
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+                    LABEL "Draft Options":COLLAPSER_WIDTH VALUE(sgdraftlabel.val);
+                    TOGGLE_BUTTON "Create/Upload Movie" VALUE(sguploadmovie.val);
+                    TOGGLE_BUTTON "Create/Upload Film Strip" VALUE(sguploadfilm.val);
+                }
+            }
+
+            BLANK;
+            SEPARATOR;
+
+            #Draft Settings
+            {
+                LAYOUT(vertical) HSTRETCH SPACING(V_SPACE) JUSTIFY(left, center)
+                LABEL(bold) "Draft";
+
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+                    TOGGLE_BUTTON "Submit Draft Job On Completion" PREF_WIDTH(3.45) VALUE(draftsubmit.val);
+                    TOGGLE_BUTTON "Upload To Shotgun" VALUE(drafttoshotgun.val);
+                }
+
+                TOGGLE_BUTTON "Quick": LABEL_WIDTH HSTRETCH VALUE(draftQuick.val);
+
+                {
+                    LAYOUT(cell) HSTRETCH SPACING(0.1, V_SPACE)
+
+                    LABEL "":DRAFT_MARGIN_WIDTH CELL(0,0);
+                    LABEL "":H_SPACE CELL(2,0);
+                    SELECT_MENU_BUTTON "Format":DRAFT_LABEL_WIDTH WIDTH(CONTROL_WIDTH) CELL(1,0) MENU(draftFormat.val);
+                    SELECT_MENU_BUTTON "Resolution":DRAFT_LABEL_WIDTH WIDTH(CONTROL_WIDTH) CELL(1,1) MENU(draftResolution.val);
+                    SELECT_MENU_BUTTON "Compression":DRAFT_LABEL_WIDTH HSTRETCH CELL(3,0) MENU(draftCodec.val);
+                    INT_SLIDER_FIELD "Quality":DRAFT_LABEL_WIDTH HSTRETCH CELL(3,1) RANGE(0,100) LOCK_RANGE VALUE(draftQuality.val);
+                    SELECT_MENU_BUTTON "Frame Rate":DRAFT_LABEL_WIDTH HSTRETCH CELL(3,2) MENU(draftFrameRate.val);
+                }
+
+                TOGGLE_BUTTON "Custom":LABEL_WIDTH HSTRETCH VALUE(draftCustom.val);
+                {
+                    LAYOUT(cell) HSTRETCH SPACING(H_SPACE,V_SPACE) JUSTIFY(left, center)
+
+                    LABEL "":DRAFT_MARGIN_WIDTH CELL(0,0);
+                    LABEL "Template":DRAFT_DETACHED_LABEL_WIDTH HSTRETCH CELL(1,0) VALUE(drafttemplatelabel.val);
+                    FILENAME_FIELD HSTRETCH CELL(2,0) VALUE(drafttemplate.val);
+                    STRING_FIELD "User":DRAFT_LABEL_WIDTH HSTRETCH CELL(1,1) CELLSIZE(2,1) VALUE(draftusername.val);
+                    STRING_FIELD "Entity":DRAFT_LABEL_WIDTH HSTRETCH CELL(1,2) CELLSIZE(2,1) VALUE(draftentityname.val);
+                    STRING_FIELD "Version":DRAFT_LABEL_WIDTH HSTRETCH CELL(1,3) CELLSIZE(2,1) VALUE(draftversionname.val);
+                    STRING_FIELD "Additional Args":DRAFT_LABEL_WIDTH HSTRETCH CELL(1,4) CELLSIZE(2,1) VALUE(draftadditionalargs.val);
+                }
+
+                {
+                    LAYOUT(horizontal) HSTRETCH SPACING(H_SPACE) JUSTIFY(left, center)
+
+                    LABEL "":DRAFT_MARGIN_WIDTH;
+                    LABEL "":DRAFT_DETACHED_LABEL_WIDTH;
+                    ACTION_BUTTON "Use Shotgun Data" VALUE(draftshotgundata.val);
+                }
+            }
+
+            BLANK;
+            SEPARATOR;
+        }
+    }
+    
+
+    {
+        LAYOUT(horizontal) HSTRETCH VSTRETCH SPACING(H_SPACE) JUSTIFY(left, bottom)
+
+        # Status bar
+        LABEL(bold) VALUE(status.val) HSTRETCH;
+
+        ACTION_BUTTON "Submit" VALUE(submitjob.val);
+        ACTION_BUTTON "Close"  VALUE(closedialog.val);
+    }
+}
+
+OPEN dlg.win;
+
+################################################################################
+## DEBUGGING
+################################################################################
+#
+# For the (un)lucky soul who has the pleasure of editing the Houdini UI, turn back!
+#
+# If you continue, consider yourself warned!
+# 
+#   First off, as of when this comment wass written (2014/02/05 YYYY/MM/DD). There's barely any 
+# documentation for the native UI scripting language. So I'll link the website: 
+#
+# 10.0: http://www.sidefx.com/docs/hdk10.0/hdk_uinative_uiscript.html
+# 13.0: http://www.sidefx.com/docs/hdk13.0/hdk_uinative_uiscript.html
+# 14.0: http://www.sidefx.com/docs/hdk14.0/_h_d_k__u_i_native__u_i_script.html
+# 
+#   However, there's barely anything there (even if you go to 13.0), so I recommend that you 
+# look over what I've done, so you can try to wrap your head around how I managed to get this 
+# language to works. Other than that, there's not much else I can say!
+#
