@@ -1336,6 +1336,12 @@ def GetROPs( ropOption, bypass = False ):
             if not bypass or not selectedNodes.isBypassed():
                 for rop in renderers:
                     if rop.path() == selectedNodes.path():
+
+                        if rop.type().description() =="Fetch":
+                            nodeText=rop.parm("source").eval()
+                            nodeSim=hou.node(nodeText)
+                            if nodeSim.path() not in jobs:
+                                jobs.append(nodeSim.path())
                         
                         # If this is a merge ROP, we want its input ROPs.
                         if rop.type().description() == "Merge":
