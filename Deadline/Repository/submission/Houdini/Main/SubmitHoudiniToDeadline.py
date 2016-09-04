@@ -1190,6 +1190,8 @@ def GetOutputPath( node ):
         outputFile = node.parm( "copoutput" )
     elif type == "Channel":
         outputFile = node.parm( "chopoutput" )
+    elif type == "OpenGL":
+        outputFile = node.parm( "picture" )
     elif type == "Dynamics":
         outputFile = node.parm( "dopoutput" )
     elif type == "Alfred":
