@@ -1348,13 +1348,13 @@ def GetROPs( ropOption, bypass = False ):
                             for inputROP in GetROPsFromMergeROP( rop, bypass ):
 
                                 if inputROP.type().description() =="Fetch":
+                                    print "es fetch"
                                     nodeText=inputROP.parm("source").eval()
                                     nodeSim=hou.node(nodeText)
                                     if nodeSim.path() not in jobs:
                                         jobs.append(nodeSim.path())
-                                    break
 
-                                if inputROP.path() not in jobs:
+                                if inputROP.path() not in jobs and inputROP.type().description() !="Fetch":
                                     jobs.append( inputROP.path() )
                         else:
                             if selectedNodes.path() not in jobs:
