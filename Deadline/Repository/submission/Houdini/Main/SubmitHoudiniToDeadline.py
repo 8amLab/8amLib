@@ -1354,7 +1354,7 @@ def GetROPs( ropOption, bypass = False ):
                                     if nodeSim.path() not in jobs:
                                         jobs.append(nodeSim.path())
 
-                                if inputROP.path() not in jobs and inputROP.type().description() !="Fetch":
+                                elif inputROP.path() not in jobs:
                                     jobs.append( inputROP.path() )
                         else:
                             if selectedNodes.path() not in jobs:
@@ -3385,9 +3385,21 @@ def SubmitJobCallback():
         selectedROP = hou.node( dialog.value( "rop.val" ) )
         
          # If this is a merge ROP, we want its input ROPs.
+        if selectedROP.type().description() =="Fetch":
+            nodeText=selectedROP.parm("source").eval()
+            nodeSim=hou.node(nodeText)
+            if nodeSim.path() not in jobs:
+                jobs.append(nodeSim.path())
+        
         if selectedROP.type().description() == "Merge":
             for inputROP in GetROPsFromMergeROP( selectedROP, bypassNodes ):
-                if inputROP.path() not in jobs:
+                if inputROP.type().description() =="Fetch":
+                    print "es fetch"
+                    nodeText=inputROP.parm("source").eval()
+                    nodeSim=hou.node(nodeText)
+                    if nodeSim.path() not in jobs:
+                        jobs.append(nodeSim.path())
+                elif inputROP.path() not in jobs:
                     jobs.append( inputROP.path() )
         else:
             if not bypassNodes or not selectedROP.isBypassed():
